@@ -6,15 +6,30 @@
 </head>
 <body>
   <h1>Tic Tac Toe</h1>
+
+  <div id="player-selection">
+    <div id="player1-board" class="player-board">
+      <h2>Player X</h2>
+      <input type="text" id="player1-name" placeholder="Enter Player 1 name">
+      <div class="player-score" id="player1-score">0</div>
+    </div>
+    <div id="player2-board" class="player-board">
+      <h2>Player 0</h2>
+      <input type="text" id="player2-name" placeholder="Enter Player 2 name">
+      <div class="player-score" id="player2-score">0</div>
+    </div>
+    <button id="start-btn">Start game</button>
+  </div>  
   
   <div id="game">
+    <div id="score"></div>
+    <div id="player-board"></div>
     <div id="gameboard">
       <!-- The game board will be rendered here dynamically -->
     </div>
     <div id="status">
       <!-- The game status will be displayed here dynamically -->
     </div>
-    <button id="restart-btn">Restart Game</button>
   </div>
 
   <script src="script.js"></script>

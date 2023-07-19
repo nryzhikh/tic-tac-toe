@@ -7,12 +7,19 @@ body {
   margin-top: 30px;
 }
 
+#playerboard {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+
 #gameboard {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   width: 300px;
   margin: 0 auto;
+  justify-content: center;
 }
 
 .cell {
@@ -23,7 +30,7 @@ body {
   background-color: #f2f2f2;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  min-height: 24px;
+  min-height: 28px;
 }
 
 .cell:hover {
@@ -37,4 +44,35 @@ body {
 
 #restart-btn {
   margin-top: 10px;
+  align-self: center;
+  grid-column: 2;
+}
+
+#player-selection {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 50%;
+  margin: 0 auto;
+}
+
+#player1-board {
+  display: flex;
+  flex-direction: column;
+}
+
+#player2-board {
+  display: flex;
+  flex-direction: column;
+}
+
+#start-btn {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
+.current-player {
+  border-style: solid;
+  border-color: black;
 }

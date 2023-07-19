@@ -16,14 +16,27 @@ const Gameboard = (() => {
 })();
 
 const Player = (name, mark) => {
-  return {name, mark};
+  let wins = 0;
+
+  const incrementWins = () => {
+    wins++;
+  };
+
+  const getWins = () => {
+    console.log(wins);
+    return wins;
+  }
+  
+  return {name, mark, incrementWins, getWins};
 };
 
 const Game = (() => {
-  let gameActive = true;
+  let currentPlayer;
+  let gameActive = false;
+  let round = 1;
   const players = [
-    Player('Player1', 'X'),
-    Player('Player2', '0')
+    Player('', 'X'),
+    Player('', '0')
   ];
 
   const togglePlayer = (currentPlayer) => {
@@ -54,27 +67,37 @@ const Game = (() => {
   };
 
   const playTurn = (index) => {
-    if (Gameboard.updateGameboard (index, currentPlayer.mark))
+    if (Gameboard.updateGameboard (index, currentPlayer.mark) && gameActive)
       if (checkForWin(currentPlayer.mark)) {
-        endGame(currentPlayer.name + 'wins!');
+        updateWinCounter(currentPlayer);
+        endGame(`${currentPlayer.name} wins!`);
       } else if (checkForTie()) {
         endGame('Tie!')
-      }
-      else {
+      } else {
       Gameboard.updateGameboard (index, currentPlayer.mark);
       currentPlayer = togglePlayer(currentPlayer);
-      console.log(currentPlayer, Gameboard.getGameboard())
-      };
-      renderGameboard();
+      highlightCurrentPlayer();
+      setStatusDisplay();
+    };
+    renderGameboard();
+
   };
 
   const newGame = () => {
     currentPlayer = players[0];
     renderGameboard();
+    highlightCurrentPlayer();
+    gameActive = true;
+    hideStartButton();
+    counter();
   }
 
   const endGame = (message) => {
-    alert(message);
+    statusDisplay.textContent = message;
+
+    renderGameboard();
+    gameActive = false;
+
   }
 
   const resetGame = () => {
@@ -83,7 +106,73 @@ const Game = (() => {
   }
 
   const gameBoardDiv = document.getElementById('gameboard');
-  const cells = document.querySelectorAll('.cell');
+  const statusDisplay = document.getElementById('status');
+  const startButton = document.getElementById('start-btn');
+  const player1Input = document.getElementById('player1-name');
+  const player2Input = document.getElementById('player2-name');
+  const score = document.getElementById('score');
+  const player1Score = document.getElementById('player1-score');
+  const player2Score = document.getElementById('player2-score');
+  const player1board = document.getElementById('player1-board');
+  const player2board = document.getElementById('player2-board');
+
+
+  const handleStartClick = () => {
+    const player1Name = player1Input.value.trim();
+    const player2Name = player2Input.value.trim();
+
+
+    if (player1Name !== '' && player2Name !== '') {
+      players[0].name = player1Name;
+      players[1].name = player2Name;
+      currentPlayer = players[0];
+      setStatusDisplay();
+      newGame();
+    } else {
+      alert('Please enter name for both players')
+    }
+  };
+
+  const counterCreator = () => {
+    let count = 0;
+    return () => {
+      count++;
+      score.textContent = `Round: ${count}`;
+    };
+  };
+
+  const counter = counterCreator();
+
+  const updateWinCounter = (player) => {
+    player.incrementWins();
+    if (player === players[0]) {
+      player1Score.textContent = player.getWins();
+    } else if (player === players[1]) {
+      player2Score.textContent = player.getWins();
+    }
+  };
+
+  startButton.addEventListener('click', handleStartClick);
+
+
+  const setStatusDisplay = () => {
+    statusDisplay.textContent = `Current player: ${currentPlayer.name}`;
+  };
+
+  const highlightCurrentPlayer = () => {
+    if (currentPlayer === players[0]) {
+      player1board.classList.add('current-player');
+      player2board.classList.remove('current-player');
+    } else if (currentPlayer === players[1]) {
+      player1board.classList.remove('current-player');
+      player2board.classList.add('current-player');
+    }
+  }
+
+
+  hideStartButton = () => {
+    startButton.style.display = 'none';
+  }
 
   const renderGameboard = () => {
     gameBoardDiv.innerHTML = '';
@@ -92,18 +181,47 @@ const Game = (() => {
       cellDiv.textContent = cell;
       cellDiv.dataset.index = index;
       cellDiv.addEventListener('click', (e) => {
-        playTurn(e.target.dataset.index);
+        if (gameActive)
+        playTurn(e.target.dataset.index)
+        else {
+          resetGame();
+        };
       })
       cellDiv.classList.add('cell');
-
       gameBoardDiv.appendChild(cellDiv);
     });
+    const resetDiv = document.createElement('button');
+    resetDiv.textContent = 'Clear board';
+    resetDiv.setAttribute('id', 'restart-btn');
+    resetDiv.addEventListener('click', () => {
+      Gameboard.resetGameboard();
+      renderGameboard();
+    });
+    gameBoardDiv.appendChild(resetDiv);
   }
 
-  return { playTurn, newGame, resetGame };
+  const botPlay = () => {
+    if(currentPlayer === players[1] && gameActive) {
+      setTimeout(()=> {
+        const availableMoves = [];
+        Gameboard.getGameboard().forEach((cell, index) => {
+          if (cell === ' ') {
+            availableMoves.push(index);
+          }
+        });
+        const randomIndex = Math.floor(Math.random() * availableMoves.length);
+        const selectedMove = availableMoves[randomIndex];
+        playTurn(selectedMove);
+      }, 500);
+    }
+  }
+
+
+
+
+
+
+
+  return {newGame};
 
   })();
-
-
-
-Game.newGame();
